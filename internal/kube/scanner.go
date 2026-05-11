@@ -2,6 +2,7 @@ package kube
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -43,6 +44,30 @@ type PodIssue struct {
 	Reason    string
 	Restarts  int32
 	Age       time.Duration
+}
+
+type jsonPodIssue struct {
+	Context    string  `json:"context"`
+	Namespace  string  `json:"namespace"`
+	PodName    string  `json:"pod_name"`
+	Status     string  `json:"status"`
+	Reason     string  `json:"reason,omitempty"`
+	Restarts   int32   `json:"restarts"`
+	Age        string  `json:"age"`
+	AgeSeconds float64 `json:"age_seconds"`
+}
+
+func (p PodIssue) MarshalJSON() ([]byte, error) {
+	return json.Marshal(jsonPodIssue{
+		Context:    p.Context,
+		Namespace:  p.Namespace,
+		PodName:    p.PodName,
+		Status:     p.Status,
+		Reason:     p.Reason,
+		Restarts:   p.Restarts,
+		Age:        FormatAge(p.Age),
+		AgeSeconds: p.Age.Seconds(),
+	})
 }
 
 type Event struct {

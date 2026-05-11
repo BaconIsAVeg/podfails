@@ -37,6 +37,7 @@ podfails [flags]
 | `--context` | `-c` | Regex to filter kubeconfig context names (e.g. `prod$`, `panel`) |
 | `--pods` | `-p` | Regex to filter pod names (e.g. `api-`, `web.*`) |
 | `--namespace` | `-n` | Namespace to limit scanning (default: all namespaces) |
+| `--json` | `-j` | Output pod issues as JSON instead of opening the TUI |
 
 ### Examples
 
@@ -53,6 +54,16 @@ podfails -c prod
 Scan a specific namespace for pods matching a pattern:
 ```sh
 podfails -n monitoring -p prometheus
+```
+
+Output troubled pods as JSON:
+```sh
+podfails -j
+```
+
+Format JSON output as a table with jq:
+```sh
+podfails -j | jq -r '.[] | [.namespace, .pod_name, .status, .restarts, .reason] | @tsv' | column -t -s $'\t'
 ```
 
 ### Keybindings

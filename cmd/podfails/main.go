@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -15,6 +16,7 @@ var (
 	contextRegex string
 	podRegex     string
 	namespace    string
+	jsonOutput   bool
 )
 
 var rootCmd = &cobra.Command{
@@ -34,6 +36,20 @@ var rootCmd = &cobra.Command{
 			PodRegex:  podRegex,
 			Namespace: namespace,
 		}
+
+		if jsonOutput {
+			issues, err := kube.ScanAll(clients, opts)
+			if err != nil {
+				return fmt.Errorf("scan failed: %w", err)
+			}
+			raw, err := json.Marshal(issues)
+			if err != nil {
+				return fmt.Errorf("marshaling JSON: %w", err)
+			}
+			fmt.Println(string(raw))
+			return nil
+		}
+
 		m := tui.NewModel(clients, contextRegex, opts)
 		p := tea.NewProgram(m, tea.WithAltScreen())
 		if _, err := p.Run(); err != nil {
@@ -47,6 +63,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&contextRegex, "context", "c", "", "Regex to filter context names (e.g. 'prod$', 'apps')")
 	rootCmd.Flags().StringVarP(&podRegex, "pods", "p", "", "Regex to filter pod names (e.g. 'api-', 'web.*')")
 	rootCmd.Flags().StringVarP(&namespace, "namespace", "n", "", "Namespace to limit scanning (default: all namespaces)")
+	rootCmd.Flags().BoolVarP(&jsonOutput, "json", "j", false, "Output pod issues as JSON instead of opening the TUI")
 }
 
 func main() {
