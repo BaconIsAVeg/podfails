@@ -1,5 +1,5 @@
 # Output binary
-podfails
+/podfails
 
 # Go build cache and test artifacts
 *.exe

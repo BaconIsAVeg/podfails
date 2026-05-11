@@ -7,7 +7,7 @@ A terminal TUI that scans your Kubernetes contexts and surfaces troubled pods â€
 ### Go install
 
 ```sh
-go install github.com/BaconIsAVeg/podfails@latest
+go install github.com/BaconIsAVeg/podfails/cmd/podfails@latest
 ```
 
 This installs the `podfails` binary to `$GOPATH/bin` (or `$HOME/go/bin`).

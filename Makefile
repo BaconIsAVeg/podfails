@@ -7,7 +7,7 @@ all: build
 
 ## build: compile the binary into the project root
 build:
-	go build -o $(BINARY) ./cmd/app
+	go build -o $(BINARY) ./cmd/podfails
 
 ## install: build and install the binary to $(INSTALL_DIR)
 install: build
