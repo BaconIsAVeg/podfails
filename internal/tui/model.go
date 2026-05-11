@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"github.com/BaconIsAVeg/github-tuis/buildinfo"
 	"github.com/BaconIsAVeg/github-tuis/ui/header"
 	"github.com/BaconIsAVeg/github-tuis/ui/notification"
 	"github.com/BaconIsAVeg/github-tuis/ui/statusbar"
@@ -47,6 +48,7 @@ type Model struct {
 	namespace     string
 	selectedIssue kube.PodIssue
 	loadingEvents bool
+	version       string
 }
 
 func NewModel(clients []kube.ContextClient, contextRegex string, opts kube.ScanOptions) Model {
@@ -74,6 +76,7 @@ func NewModel(clients []kube.ContextClient, contextRegex string, opts kube.ScanO
 		contextRegex: contextRegex,
 		podRegex:     opts.PodRegex,
 		namespace:    opts.Namespace,
+		version:      buildinfo.GetVersion(),
 	}
 }
 

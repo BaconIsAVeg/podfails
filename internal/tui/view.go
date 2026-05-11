@@ -34,7 +34,7 @@ func (m Model) viewTable() string {
 
 	m.statusbar.SetMode("L")
 	m.statusbar.SetKeybindings(tableKeybindings())
-	m.statusbar.SetMiddleContent("")
+	m.statusbar.SetMiddleContent(m.version)
 	m.statusbar.SetWidth(m.width)
 
 	var body string

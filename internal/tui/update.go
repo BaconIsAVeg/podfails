@@ -148,7 +148,7 @@ func (m Model) updateDetail(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.header.SetLeft(appTitle)
 		m.statusbar.SetMode("L")
 		m.statusbar.SetKeybindings(tableKeybindings())
-		m.statusbar.SetMiddleContent("")
+		m.statusbar.SetMiddleContent(m.version)
 		return m, nil
 	default:
 		var cmd tea.Cmd
