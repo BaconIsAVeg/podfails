@@ -31,7 +31,7 @@ const (
 type Model struct {
 	state         state
 	clients       []kube.ContextClient
-	issues        []kube.PodIssue
+	issues        []kube.Issue
 	events        []kube.Event
 	table         table.Model
 	viewport      viewport.Model
@@ -46,7 +46,7 @@ type Model struct {
 	contextRegex  string
 	podRegex      string
 	namespace     string
-	selectedIssue kube.PodIssue
+	selectedIssue kube.Issue
 	loadingEvents bool
 	version       string
 }

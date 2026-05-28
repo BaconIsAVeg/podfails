@@ -26,8 +26,8 @@ func (m Model) scanOpts() kube.ScanOptions {
 	return kube.ScanOptions{PodRegex: m.podRegex, Namespace: m.namespace}
 }
 
-func (m Model) issueBreadcrumb(iss kube.PodIssue) string {
-	return fmt.Sprintf("%s / %s / %s", truncateStart(iss.Context, contextColWidth), iss.Namespace, iss.PodName)
+func (m Model) issueBreadcrumb(iss kube.Issue) string {
+	return fmt.Sprintf("%s / %s / %s", truncateStart(iss.Context, contextColWidth), iss.Namespace, iss.Name)
 }
 
 func (m Model) withOverlay(base string) string {
@@ -39,23 +39,23 @@ func (m Model) withOverlay(base string) string {
 	return base
 }
 
-func buildTable(issues []kube.PodIssue, width, height int) table.Model {
+func buildTable(issues []kube.Issue, width, height int) table.Model {
 	contextW := contextColWidth
 	nsW := 18
 	statusW := 24
-	restartsW := 9
+	metricW := 9
 	ageW := 7
-	podW := width - contextW - nsW - statusW - restartsW - ageW - 10
-	if podW < 20 {
-		podW = 20
+	nameW := width - contextW - nsW - statusW - metricW - ageW - 10
+	if nameW < 20 {
+		nameW = 20
 	}
 
 	cols := []table.Column{
 		{Title: "CONTEXT", Width: contextW},
 		{Title: "NAMESPACE", Width: nsW},
-		{Title: "POD", Width: podW},
+		{Title: "NAME", Width: nameW},
 		{Title: "STATUS", Width: statusW},
-		{Title: "RESTARTS", Width: restartsW},
+		{Title: "METRIC", Width: metricW},
 		{Title: "AGE", Width: ageW},
 	}
 
@@ -64,9 +64,9 @@ func buildTable(issues []kube.PodIssue, width, height int) table.Model {
 		rows[i] = table.Row{
 			truncateStart(iss.Context, contextW),
 			truncate(iss.Namespace, nsW),
-			truncate(iss.PodName, podW),
+			truncate(iss.Name, nameW),
 			truncate(iss.Status, statusW),
-			fmt.Sprintf("%d", iss.Restarts),
+			iss.Metric,
 			kube.FormatAge(iss.Age),
 		}
 	}

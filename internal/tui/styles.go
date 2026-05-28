@@ -72,6 +72,8 @@ var statusStyleMap = map[string]lipgloss.Style{
 	kube.StatusPending:                    statusWarningStyle,
 	kube.StatusHighRestarts:               statusWarningStyle,
 	kube.StatusUnknown:                    statusInfoStyle,
+	kube.StatusAtMaxReplicas:              statusWarningStyle,
+	kube.StatusScalingLimited:             statusWarningStyle,
 }
 
 func statusStyle(status string) lipgloss.Style {

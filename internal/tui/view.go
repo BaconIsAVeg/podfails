@@ -29,7 +29,7 @@ func (m Model) viewLoading() string {
 func (m Model) viewTable() string {
 	m.header.SetLeft(appTitle)
 	m.header.SetMiddle(m.filterSummary())
-	m.header.SetRight(fmt.Sprintf("%d pod(s)", len(m.issues)))
+	m.header.SetRight(fmt.Sprintf("%d issue(s)", len(m.issues)))
 	m.header.SetWidth(m.width)
 
 	m.statusbar.SetMode("L")
@@ -43,7 +43,7 @@ func (m Model) viewTable() string {
 			Padding(1, 2).
 			Render(fmt.Sprintf("Error: %v", m.err))
 	} else if len(m.issues) == 0 {
-		body = healthyStyle.Render("✓  All pods are healthy across all scanned contexts.")
+		body = healthyStyle.Render("✓  All resources are healthy across all scanned contexts.")
 	} else {
 		body = m.table.View()
 	}
@@ -84,17 +84,60 @@ func (m Model) renderDetail() string {
 
 	sb := &strings.Builder{}
 	fmt.Fprint(sb, "\n")
-	fmt.Fprintf(sb, "  Pod:        %s\n", issue.PodName)
-	fmt.Fprintf(sb, "  Namespace:  %s\n", issue.Namespace)
-	fmt.Fprintf(sb, "  Context:    %s\n", issue.Context)
-	fmt.Fprintf(sb, "  Status:     %s\n", statusRendered)
+	fmt.Fprintf(sb, "  Name:      %s\n", issue.Name)
+	fmt.Fprintf(sb, "  Namespace: %s\n", issue.Namespace)
+	fmt.Fprintf(sb, "  Context:   %s\n", issue.Context)
+	fmt.Fprintf(sb, "  Kind:      %s\n", issue.Kind)
+	fmt.Fprintf(sb, "  Status:    %s\n", statusRendered)
 	if issue.Reason != "" {
-		fmt.Fprintf(sb, "  Reason:     %s\n", issue.Reason)
+		fmt.Fprintf(sb, "  Reason:    %s\n", issue.Reason)
 	}
-	fmt.Fprintf(sb, "  Restarts:   %d\n", issue.Restarts)
-	fmt.Fprintf(sb, "  Age:        %s\n", kube.FormatAge(issue.Age))
-	sb.WriteString("\n")
+	if issue.Kind == kube.KindHPA {
+		fmt.Fprintf(sb, "  Minimum:   %d\n", issue.MinReplicas)
+		fmt.Fprintf(sb, "  Maximum:   %d\n", issue.MaxReplicas)
+		fmt.Fprintf(sb, "  Replicas:  %d\n", issue.CurrentReplicas)
+	} else if issue.Metric != "" {
+		fmt.Fprintf(sb, "  Restarts:  %s\n", issue.Metric)
+	}
+	fmt.Fprintf(sb, "  Age:       %s\n", kube.FormatAge(issue.Age))
 
+	if len(issue.Conditions) > 0 {
+		sb.WriteString("\n")
+		dividerWidth := max(m.width-4, 20)
+		sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
+		sb.WriteString("\n  Conditions\n")
+		sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
+		sb.WriteString("\n")
+
+		typeW := 18
+		statusW := 6
+		reasonW := 28
+		ageW := 8
+		msgW := max(dividerWidth - typeW - statusW - reasonW - ageW - 14, 10)
+		fmt.Fprintf(sb, "  %-*s  %-*s  %-*s  %-*s  %s\n",
+			typeW, "TYPE", statusW, "STATUS", reasonW, "REASON", msgW, "MESSAGE", "AGE")
+		sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
+		sb.WriteString("\n")
+		for _, cond := range issue.Conditions {
+			msg := truncate(cond.Message, msgW)
+			line := fmt.Sprintf("  %-*s  %-*s  %-*s  %-*s  %s",
+				typeW, truncate(cond.Type, typeW),
+				statusW, cond.Status,
+				reasonW, truncate(cond.Reason, reasonW),
+				msgW, msg,
+				kube.FormatAge(cond.Age))
+			var style lipgloss.Style
+			if cond.Status == "True" {
+				style = warningEventStyle
+			} else {
+				style = normalEventStyle
+			}
+			sb.WriteString(style.Render(line))
+			sb.WriteString("\n")
+		}
+	}
+
+	sb.WriteString("\n")
 	dividerWidth := max(m.width-4, 20)
 	sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
 	sb.WriteString("\n  Events\n")
@@ -111,10 +154,7 @@ func (m Model) renderDetail() string {
 		typeW := 8
 		reasonW := 22
 		ageW := 8
-		msgW := dividerWidth - typeW - reasonW - ageW - 10
-		if msgW < 10 {
-			msgW = 10
-		}
+		msgW := max(dividerWidth - typeW - reasonW - ageW - 10, 10)
 		fmt.Fprintf(sb, "  %-*s  %-*s  %-*s  %s\n", typeW, "TYPE", reasonW, "REASON", msgW, "MESSAGE", "AGE")
 		sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
 		sb.WriteString("\n")

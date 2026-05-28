@@ -130,7 +130,7 @@ func (m Model) updateTable(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.loadingEvents = false
 			return m, nil
 		}
-		return m, fetchEventsCmd(*cc, issue.Namespace, issue.PodName)
+		return m, fetchEventsCmd(*cc, issue)
 
 	default:
 		var cmd tea.Cmd

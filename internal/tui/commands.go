@@ -6,7 +6,7 @@ import (
 	"github.com/BaconIsAVeg/podfails/internal/kube"
 )
 
-type scanDoneMsg struct{ issues []kube.PodIssue }
+type scanDoneMsg struct{ issues []kube.Issue }
 type scanErrMsg struct{ err error }
 type eventsDoneMsg struct{ events []kube.Event }
 type eventsErrMsg struct{ err error }
@@ -21,9 +21,16 @@ func scanCmd(clients []kube.ContextClient, opts kube.ScanOptions) tea.Cmd {
 	}
 }
 
-func fetchEventsCmd(cc kube.ContextClient, namespace, podName string) tea.Cmd {
+func fetchEventsCmd(cc kube.ContextClient, issue kube.Issue) tea.Cmd {
 	return func() tea.Msg {
-		events, err := kube.GetPodEvents(cc.Client, namespace, podName)
+		var events []kube.Event
+		var err error
+		switch issue.Kind {
+		case kube.KindHPA:
+			events, err = kube.GetHPAEvents(cc.Client, issue.Namespace, issue.Name)
+		default:
+			events, err = kube.GetPodEvents(cc.Client, issue.Namespace, issue.Name)
+		}
 		if err != nil {
 			return eventsErrMsg{err: err}
 		}
