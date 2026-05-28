@@ -70,7 +70,6 @@ type jsonIssue struct {
 	Reason          string          `json:"reason,omitempty"`
 	Metric          string          `json:"metric"`
 	Age             string          `json:"age"`
-	AgeSeconds      float64         `json:"age_seconds"`
 	Conditions      []jsonCondition `json:"conditions,omitempty"`
 	MinReplicas     int32           `json:"min_replicas,omitempty"`
 	MaxReplicas     int32           `json:"max_replicas,omitempty"`
@@ -81,12 +80,11 @@ func (i Issue) MarshalJSON() ([]byte, error) {
 	conditions := make([]jsonCondition, len(i.Conditions))
 	for j, c := range i.Conditions {
 		conditions[j] = jsonCondition{
-			Type:       c.Type,
-			Status:     c.Status,
-			Reason:     c.Reason,
-			Message:    c.Message,
-			Age:        FormatAge(c.Age),
-			AgeSeconds: c.Age.Seconds(),
+			Type:    c.Type,
+			Status:  c.Status,
+			Reason:  c.Reason,
+			Message: c.Message,
+			Age:     FormatAge(c.Age),
 		}
 	}
 	ji := jsonIssue{
@@ -98,7 +96,6 @@ func (i Issue) MarshalJSON() ([]byte, error) {
 		Reason:          i.Reason,
 		Metric:          i.Metric,
 		Age:             FormatAge(i.Age),
-		AgeSeconds:      i.Age.Seconds(),
 		Conditions:      conditions,
 		MinReplicas:     i.MinReplicas,
 		MaxReplicas:     i.MaxReplicas,
@@ -116,12 +113,11 @@ type Condition struct {
 }
 
 type jsonCondition struct {
-	Type    string  `json:"type"`
-	Status  string  `json:"status"`
-	Reason  string  `json:"reason,omitempty"`
-	Message string  `json:"message,omitempty"`
-	Age     string  `json:"age"`
-	AgeSeconds float64 `json:"age_seconds"`
+	Type    string `json:"type"`
+	Status  string `json:"status"`
+	Reason  string `json:"reason,omitempty"`
+	Message string `json:"message,omitempty"`
+	Age     string `json:"age"`
 }
 
 type Event struct {
