@@ -47,15 +47,15 @@ const (
 )
 
 type Issue struct {
-	Kind       string
-	Context    string
-	Namespace  string
-	Name       string
-	Status     string
-	Reason     string
-	Metric     string
-	Age        time.Duration
-	Conditions []Condition
+	Kind            string
+	Context         string
+	Namespace       string
+	Name            string
+	Status          string
+	Reason          string
+	Metric          string
+	Age             time.Duration
+	Conditions      []Condition
 	MinReplicas     int32
 	MaxReplicas     int32
 	CurrentReplicas int32

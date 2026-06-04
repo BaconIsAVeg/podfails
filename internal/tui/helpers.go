@@ -26,8 +26,15 @@ func (m Model) scanOpts() kube.ScanOptions {
 	return kube.ScanOptions{PodRegex: m.podRegex, Namespace: m.namespace}
 }
 
+func shortContext(s string) string {
+	if idx := strings.LastIndex(s, "/"); idx >= 0 {
+		return s[idx+1:]
+	}
+	return s
+}
+
 func (m Model) issueBreadcrumb(iss kube.Issue) string {
-	return fmt.Sprintf("%s / %s / %s", truncateStart(iss.Context, contextColWidth), iss.Namespace, iss.Name)
+	return fmt.Sprintf("%s / %s / %s", shortContext(iss.Context), iss.Namespace, iss.Name)
 }
 
 func (m Model) withOverlay(base string) string {
@@ -62,7 +69,7 @@ func buildTable(issues []kube.Issue, width, height int) table.Model {
 	rows := make([]table.Row, len(issues))
 	for i, iss := range issues {
 		rows[i] = table.Row{
-			truncateStart(iss.Context, contextW),
+			truncate(shortContext(iss.Context), contextW),
 			truncate(iss.Namespace, nsW),
 			truncate(iss.Name, nameW),
 			truncate(iss.Status, statusW),

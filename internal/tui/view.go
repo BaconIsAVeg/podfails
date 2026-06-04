@@ -113,7 +113,7 @@ func (m Model) renderDetail() string {
 		statusW := 6
 		reasonW := 28
 		ageW := 8
-		msgW := max(dividerWidth - typeW - statusW - reasonW - ageW - 14, 10)
+		msgW := max(dividerWidth-typeW-statusW-reasonW-ageW-14, 10)
 		fmt.Fprintf(sb, "  %-*s  %-*s  %-*s  %-*s  %s\n",
 			typeW, "TYPE", statusW, "STATUS", reasonW, "REASON", msgW, "MESSAGE", "AGE")
 		sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
@@ -154,7 +154,7 @@ func (m Model) renderDetail() string {
 		typeW := 8
 		reasonW := 22
 		ageW := 8
-		msgW := max(dividerWidth - typeW - reasonW - ageW - 10, 10)
+		msgW := max(dividerWidth-typeW-reasonW-ageW-10, 10)
 		fmt.Fprintf(sb, "  %-*s  %-*s  %-*s  %s\n", typeW, "TYPE", reasonW, "REASON", msgW, "MESSAGE", "AGE")
 		sb.WriteString(dividerStyle.Render("  " + strings.Repeat("─", dividerWidth)))
 		sb.WriteString("\n")
